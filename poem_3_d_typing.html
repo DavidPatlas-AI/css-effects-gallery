@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>תשמור על העולם ילד</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Varela Round', sans-serif;
+      background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0c29 100%);
+    }
+    #bg3d, #textLayer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #textLayer {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+<canvas id="textLayer"></canvas>
+<audio id="typeSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c91e91e957.mp3?filename=mechanical-keyboard-single-button-press-1-7053.mp3"></audio>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+    }
+  }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// 3D BACKGROUND SETUP
+const canvas3d = document.getElementById('bg3d');
+const renderer = new THREE.WebGLRenderer({ canvas: canvas3d, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 2000);
+camera.position.z = 100;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.25;
+controls.enableZoom = false;
+controls.enablePan = false;
+
+const starsGeometry = new THREE.BufferGeometry();
+const starCount = 10000;
+const positions = [];
+for (let i = 0; i < starCount; i++) {
+  const x = THREE.MathUtils.randFloatSpread(2000);
+  const y = THREE.MathUtils.randFloatSpread(2000);
+  const z = THREE.MathUtils.randFloatSpread(2000);
+  positions.push(x, y, z);
+}
+starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+const starsMaterial = new THREE.PointsMaterial({ color: 0x8888ff, size: 0.8 });
+const starField = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(starField);
+
+function animate3D() {
+  requestAnimationFrame(animate3D);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate3D();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  resizeCanvas2D();
+});
+
+// 2D TEXT LAYER
+const canvas2d = document.getElementById('textLayer');
+const ctx = canvas2d.getContext('2d');
+const typeSound = document.getElementById('typeSound');
+
+function resizeCanvas2D() {
+  canvas2d.width = window.innerWidth;
+  canvas2d.height = window.innerHeight;
+}
+resizeCanvas2D();
+
+const lines = [
+  "תשמור על העולם ילד יש דברים שאסור לראות 😢",
+  "תשמור על העולם ילד אם תראה תפסיק להיות גיבור 😢",
+  "גיבור של העולם ילד עם חיוך של מלאכים",
+  "תשמור על העולם ילד כי אנחנו כבר לא מצליחים",
+  "אל תגזים במחשבות כי כמה שתדע יותר 😢",
+  "ובשעה מסוימת נסגרות כל הדלתות",
+  "וכל האהבה נגמרת, רק אתה ממשיך לתהות"
+];
+
+let x = 0, y = 0;
+function drawTyping() {
+  ctx.clearRect(0, 0, canvas2d.width, canvas2d.height);
+  ctx.shadowColor = '#ff66cc';
+  ctx.shadowBlur = 10;
+  ctx.font = "28px 'Varela Round', sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.textBaseline = "top";
+  ctx.direction = "rtl";
+
+  for (let i = 0; i <= y; i++) {
+    let line = lines[i];
+    if (i === y) {
+      line = line.substring(0, x);
+    }
+    const width = ctx.measureText(line).width;
+    ctx.fillText(line, canvas2d.width - width - 60, 80 + i * 44);
+  }
+
+  if (x <= lines[y]?.length) {
+    typeSound.currentTime = 0;
+    typeSound.play();
+  }
+  x++;
+  if (x > lines[y]?.length) {
+    x = 0;
+    y++;
+  }
+  if (y < lines.length) {
+    requestAnimationFrame(drawTyping);
+  }
+}
+requestAnimationFrame(drawTyping);
+</script>
+</body>
+</html>

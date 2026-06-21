@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>מלחמת ששת הימים - אנימציית קוד</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id='oldSkool'></canvas>
+  <script>
+    var db = document.body;
+    var c = document.getElementById('oldSkool');
+    var $ = c.getContext('2d');
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+
+    // סיפור על מלחמת ששת הימים
+    const _s = [
+      "מלחמת ששת הימים התרחשה ביוני 1967.",
+      "היא נמשכה שישה ימים בלבד.",
+      "ישראל לחמה נגד מצרים, ירדן וסוריה.",
+      "ביום הראשון הושמדה כמעט כל חיל האוויר המצרי.",
+      "צה" + "ל התקדם במהירות לחצי האי סיני.",
+      "ביום השלישי שוחררה ירושלים המזרחית.",
+      "הכותל המערבי שב לחיק העם היהודי.",
+      "ברמת הגולן התנהלו קרבות עזים מול הסורים.",
+      "ביום השישי הושגה הפסקת אש.",
+      "המלחמה שינתה את פני המזרח התיכון.",
+      "שחרור ירושלים נחרט בלב האומה.",
+      "יהי זכר הנופלים ברוך."
+    ];
+
+    let x = 0;
+    let y = 0;
+    let w = c.width = window.innerWidth;
+    let h = c.height = _s.length * 20;
+
+    db.style.margin = 0;
+    db.style.background = "black";
+    db.style.overflow = "hidden";
+
+    $.textBaseline = "top";
+    $.font = "1.1em monospace";
+
+    function resume() {
+      $.globalCompositeOperation = "source-over";
+      $.shadowBlur = 0;
+      $.fillStyle = "rgba(0,0,0,0.4)";
+      $.fillRect(0, 0, w, h);
+      $.shadowColor = "hsla(60, 100%, 70%, 0.5)";
+      $.shadowBlur = 9;
+      $.fillStyle = "hsla(60, 100%, 50%, 1)";
+      $.globalCompositeOperation = "lighter";
+
+      _s.forEach(function (t, i) {
+        if (i <= y) {
+          let line = (i === y) ? t.substring(0, x) : t;
+          $.fillText(line, 100, 100 + i * 20);
+        }
+      });
+
+      if (y < _s.length) {
+        $.fillStyle = "hsla(60, 100%, 70%, 1)";
+        $.fillRect(100 + $.measureText(_s[y].substring(0, x)).width, 102 + y * 20, 10, 16);
+      }
+
+      x++;
+      if (y < _s.length && x >= _s[y].length) {
+        y++;
+        x = 0;
+      }
+
+      if (y * 20 > window.innerHeight - 200) {
+        $.translate(0, -0.5);
+      }
+    }
+
+    function relay() {
+      window.requestAnimationFrame(relay);
+      resume();
+    }
+
+    relay();
+  </script>
+</body>
+</html>

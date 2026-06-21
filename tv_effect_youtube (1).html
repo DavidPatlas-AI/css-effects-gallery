@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Old TV YouTube Effect</title>
+  <style>
+    body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+    }
+    .tv-screen {
+      position: absolute;
+      width: 90vw;
+      height: 50vw;
+      max-width: 100%;
+      max-height: 100vh;
+      background-image: url(https://alexandrevacassin.fr/codepen/old-tv/base.webp);
+      z-index: 10;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .tv-container {
+      position: absolute;
+      margin-bottom: 3vw;
+      width: 60vw;
+      margin-right: 10vw;
+      height: 45vw;
+      max-width: 100%;
+      max-height: 70vh;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      filter: contrast(1.2) brightness(1.1);
+    }
+    .glitch, .scan-lines, .snow-effect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .glitch {
+      background: url("https://upload.wikimedia.org/wikipedia/commons/0/02/Television_static.gif");
+      mix-blend-mode: multiply;
+      opacity: 0.3;
+      animation: glitchMove 0.2s infinite linear;
+    }
+    .scan-lines {
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0.2) 1px,
+        rgba(0, 0, 0, 0) 2px
+      );
+    }
+    .snow-effect {
+      background: url("https://upload.wikimedia.org/wikipedia/commons/0/02/Television_static.gif");
+      background-size: cover;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      z-index: 3;
+    }
+    @keyframes glitchMove {
+      0% { transform: translateX(0); }
+      33% { transform: translateX(-5px); }
+      66% { transform: translateX(5px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="tv-screen"></div>
+  <div class="tv-container">
+    <iframe id="ytplayer" frameborder="0" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+    <div class="glitch"></div>
+    <div class="scan-lines"></div>
+    <div class="snow-effect"></div>
+  </div>
+  <script>
+    const iframe = document.getElementById("ytplayer");
+    const snowEffect = document.querySelector(".snow-effect");
+    const videoIds = [
+      "c4CVKbVtTsc", // אש
+      "dAiomIGB3qo", // מים
+      "7PgJLyeb6sM", // אדמה
+      "J5SSsT1O9gE", // ברק עם עיניים
+      "Jf6tPJEh8a8"  // אש/מים/אדמה/ברק עיצובי
+    ];
+    let currentVideoIndex = 0;
+
+    function switchToNextVideo() {
+      snowEffect.style.opacity = 1;
+      setTimeout(() => {
+        currentVideoIndex = (currentVideoIndex + 1) % videoIds.length;
+        const id = videoIds[currentVideoIndex];
+        iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=0&loop=1&mute=1&playlist=${id}`;
+        snowEffect.style.opacity = 0;
+      }, 2000);
+    }
+
+    iframe.onload = () => {
+      setInterval(switchToNextVideo, 20000);
+    };
+
+    const first = videoIds[currentVideoIndex];
+    iframe.src = `https://www.youtube.com/embed/${first}?autoplay=1&controls=0&loop=1&mute=1&playlist=${first}`;
+  </script>
+</body>
+</html>
